@@ -120,10 +120,25 @@ prep_nimble <- function(N, take, X){
     property_x = N$property,
     pp_x = N$PPNum,
     pp_len = 28,
-    phi_mu_a = 3.233689,
-    phi_mu_b = 0.1996036,
+    phi_mu_a = 3.23,
+    phi_mu_b = 0.2,
     y_sum = y_sum$ysum,
-    rem = as.matrix(removed_timestep)
+    rem = as.matrix(removed_timestep),
+    log_rho_mu = rep(0, 5),
+    log_rho_tau = rep(0.1, 5),
+    p_mu_mu = rep(0, 2),
+    p_mu_tau = rep(1, 2),
+    log_gamma_mu = rep(0, 2),
+    log_gamma_tau = rep(0.1, 2),
+    beta1_mu = rep(0, 5),
+    beta1_tau = rep(1, 5),
+    beta_p_mu = rep(0, 15),
+    beta_p_tau = rep(1, 15),
+    psi_shape = 1,
+    psi_rate = 0.1,
+    log_nu_mu = 2,
+    log_nu_tau = 1
+
   )
 
   data <- list(
