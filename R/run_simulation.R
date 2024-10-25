@@ -175,7 +175,7 @@ run_simulation <- function(config, df, task_id){
 
     custom_samplers <- NULL
 
-    source("R/model_removal_dm.R")
+    source("R/nimble_removal_model.R")
 
     monitors_add <- "N"
 
@@ -185,7 +185,7 @@ run_simulation <- function(config, df, task_id){
     message(constants$n_property, " properties simulated")
     message("Fitting MCMC with ", n_iter, " iterations across ", n_chains, " chains")
 
-    source("R/fit_mcmc.R")
+    source("R/fit_mcmc_simulation.R")
     cl <- makeCluster(n_chains)
     samples <- fit_mcmc(
       cl,
