@@ -15,7 +15,6 @@ run_simulation <- function(config, df, task_id){
     require(tidyr)
     require(purrr)
 
-    top_dir <- config$top_dir
     out_dir <- config$out_dir
     dev_dir <- config$dev_dir
     model_dir <- config$model_dir
@@ -23,7 +22,7 @@ run_simulation <- function(config, df, task_id){
     start_density <- config$start_density
     density_dir <- paste0("density_", start_density)
 
-    path <- file.path(top_dir, project_dir, out_dir, dev_dir, model_dir, density_dir)
+    path <- file.path(project_dir, out_dir, dev_dir, model_dir, density_dir)
     dest <- file.path(path, task_id)
     message("Simulations will be written to\n   ", dest)
 
@@ -136,7 +135,7 @@ run_simulation <- function(config, df, task_id){
           beta_p,
           start_density,
           method_lookup,
-          file.path(top_dir, data_dir, "insitu/effort_data.csv")
+          file.path(data_dir, "effort_data.csv")
         )
       ) |>
       compact() |> # some properties will be empty because they go extinct during spin-up
@@ -169,18 +168,11 @@ run_simulation <- function(config, df, task_id){
     # Fit MCMC ----
     # -----------------------------------------------------------------
     message("Fit MCMC")
-    source("R/prep_nimble.R")
+    source("R/prep_nimble_simulation.R")
     nimble_data <- prep_nimble(N, take, land_cover)
     constants <- nimble_data$constants
     data <- nimble_data$data
 
-    #custom_samplers <- tribble(
-    #  ~node,            ~type,
-    #  "log_nu",         "slice",
-    #  "phi_mu",         "slice",
-    #  "psi_phi",        "slice",
-    #  "log_rho",        "AF_slice"
-    #)
     custom_samplers <- NULL
 
     source("R/model_removal_dm.R")
