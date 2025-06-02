@@ -96,29 +96,23 @@ prep_nimble <- function(N, take, X){
 
   constants <- list(
     n_survey = nrow(take),
-    # n_lpy = length(data_litters_per_year),
     n_ls = length(data_litter_size),
     n_property = max(N$property),
     n_first_survey = length(which(take$order == 1)),
     n_not_first_survey = length(which(take$order != 1)),
     n_method = 5,
-    n_units = nrow(N),
     n_time_prop = n_time_prop,
-    all_pp = as.matrix(all_pp_wide),
+    n_betaP = 15,
     nH = as.matrix(nH),
     nH_p = nH_p,
     log_pi = log(pi),
     m_p = ncol(X),
     first_survey = which(take$order == 1),
     not_first_survey = which(take$order != 1),
-    p_property_idx = take$property,
-    p_pp_idx = take$PPNum,
     start = take$start,
     end = take$end,
     method = as.numeric(as.factor(take$method)),
     county = take$county,
-    property_x = N$property,
-    pp_x = N$PPNum,
     pp_len = 28,
     phi_mu_a = 3.23,
     phi_mu_b = 0.2,
@@ -137,13 +131,14 @@ prep_nimble <- function(N, take, X){
     psi_shape = 1,
     psi_rate = 0.1,
     log_nu_mu = 2,
-    log_nu_tau = 1
+    log_nu_tau = 1,
+    beta_p_row = rep(1:5, each = ncol(X)),
+    beta_p_col = rep(1:ncol(X), 5)
 
   )
 
   data <- list(
     y = take$take,
-    # K = data_litters_per_year,
     J = data_litter_size,
     X_p = X,
     effort_per = take$effort_per,
