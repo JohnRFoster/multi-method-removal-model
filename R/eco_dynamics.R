@@ -16,9 +16,6 @@ simulate_dm <- function(
   require(dplyr)
   require(tidyr)
 
-  # mean litters per year from VerCauteren et al. 2019 pg 64
-  data_litters_per_year <- c(1, 2, 0.86, 1, 2.28, 2.9, 0.49, 0.85, 1.57)
-
   # mean litter size year from VerCauteren et al. 2019 pg 63
   data_litter_size <- c(5.6, 6.1, 5.6, 6.1, 4.2, 5.0, 5.0, 6.5, 5.5, 6.8,
                         5.6, 5.9, 4.9, 5.1, 4.5, 4.7, 5.3, 5.7, 7.4, 8.4,
