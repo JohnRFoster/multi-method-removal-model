@@ -1,6 +1,6 @@
 # --------------------------------------------------------------------
 #
-# Workflow script for invasice species removal simulations
+# Workflow script for invasive species removal simulations
 #
 # Author:
 # John Foster
@@ -48,9 +48,12 @@ df <- df |>
 # Run simulation ----
 # -----------------------------------------------------------------
 
+# meant to be run in parallel on an hpc
+# the array number gets assigned to task_id
+
 args <- commandArgs(trailingOnly = TRUE)
 task_id <- args[1]
-if(is.na(task_id)) task_id <- 1
+if(is.na(task_id)) task_id <- 1 # for testing locally
 message("Task ID: ", task_id)
 
 source("R/run_simulation.R")
