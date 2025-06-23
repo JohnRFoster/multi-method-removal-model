@@ -31,7 +31,6 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 
-
 # -----------------------------------------------------------------
 # Load MIS data ----
 # -----------------------------------------------------------------
@@ -41,8 +40,7 @@ df <- read_rds(file.path(data_dir, "MIS_4weekPP.rds"))
 df <- df |>
   filter(property.size >= 1.8) |> # median home range size from Kay et al. (2017)
   select(-method) |>
-  rename(property = agrp_prp_id,
-         method = Method)
+  rename(property = agrp_prp_id, method = Method)
 
 # -----------------------------------------------------------------
 # Run simulation ----
@@ -53,7 +51,9 @@ df <- df |>
 
 args <- commandArgs(trailingOnly = TRUE)
 task_id <- args[1]
-if(is.na(task_id)) task_id <- 1 # for testing locally
+if (is.na(task_id)) {
+  task_id <- 1
+} # for testing locally
 message("Task ID: ", task_id)
 
 source("R/run_simulation.R")
@@ -70,4 +70,3 @@ message("\nRun time: ")
 print(Sys.time() - start)
 
 message("\n\nDONE!")
-

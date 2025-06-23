@@ -1,6 +1,4 @@
-
-prep_nimble <- function(N, take, X){
-
+prep_nimble <- function(N, take, X) {
   require(dplyr)
   require(tidyr)
 
@@ -18,15 +16,13 @@ prep_nimble <- function(N, take, X){
 
   # so we can iterate through each PP for each property and keep track of index
   all_pp_wide <- N_timestep |>
-    pivot_wider(names_from = timestep,
-                values_from = PPNum) |>
+    pivot_wider(names_from = timestep, values_from = PPNum) |>
     select(-property)
 
   nH <- N_timestep |>
     mutate(n_id = 1:n()) |>
     select(-PPNum) |>
-    pivot_wider(names_from = timestep,
-                values_from = n_id) |>
+    pivot_wider(names_from = timestep, values_from = n_id) |>
     select(-property)
 
   # Generate start and end indices for previous surveys
@@ -45,10 +41,12 @@ prep_nimble <- function(N, take, X){
   pb <- txtProgressBar(max = nrow(take), style = 1)
   for (i in 1:nrow(take)) {
     if (take$order[i] > 1) {
-      idx <- which(take$county == take$county[i] &
-                     take$property == take$property[i] &
-                     take$timestep == take$timestep[i] &
-                     take$order < take$order[i])
+      idx <- which(
+        take$county == take$county[i] &
+          take$property == take$property[i] &
+          take$timestep == take$timestep[i] &
+          take$order < take$order[i]
+      )
       take$start[i] <- idx[1]
       take$end[i] <- idx[length(idx)]
       assertthat::are_equal(idx, take$start[i]:take$end[i])
@@ -56,7 +54,6 @@ prep_nimble <- function(N, take, X){
     setTxtProgressBar(pb, i)
   }
   close(pb)
-
 
   y_sum <- take |>
     group_by(property, PPNum) |>
@@ -71,8 +68,7 @@ prep_nimble <- function(N, take, X){
   removed_timestep <- left_join(N_timestep, sum_take) |>
     mutate(sum_take = if_else(is.na(sum_take), 0, sum_take)) |>
     select(-PPNum) |>
-    pivot_wider(names_from = timestep,
-                values_from = sum_take) |>
+    pivot_wider(names_from = timestep, values_from = sum_take) |>
     select(-property)
 
   tH <- take |>
@@ -87,12 +83,41 @@ prep_nimble <- function(N, take, X){
   data_litters_per_year <- c(1, 2, 0.86, 1, 2.28, 2.9, 0.49, 0.85, 1.57)
 
   # mean litter size year from VerCauteren et al. 2019 pg 63
-  data_litter_size <- c(5.6, 6.1, 5.6, 6.1, 4.2, 5.0, 5.0, 6.5, 5.5, 6.8,
-                        5.6, 5.9, 4.9, 5.1, 4.5, 4.7, 5.3, 5.7, 7.4, 8.4,
-                        4.7, 4.9, 3.0, 3.0, 4.8, 4.8, 4.2, 5.4, 4.7, 5.2, 5.4)
+  data_litter_size <- c(
+    5.6,
+    6.1,
+    5.6,
+    6.1,
+    4.2,
+    5.0,
+    5.0,
+    6.5,
+    5.5,
+    6.8,
+    5.6,
+    5.9,
+    4.9,
+    5.1,
+    4.5,
+    4.7,
+    5.3,
+    5.7,
+    7.4,
+    8.4,
+    4.7,
+    4.9,
+    3.0,
+    3.0,
+    4.8,
+    4.8,
+    4.2,
+    5.4,
+    4.7,
+    5.2,
+    5.4
+  )
 
   data_litter_size <- round(data_litter_size)
-
 
   constants <- list(
     n_survey = nrow(take),
@@ -135,7 +160,6 @@ prep_nimble <- function(N, take, X){
     log_nu_tau = 1,
     beta_p_row = rep(1:5, each = ncol(X)),
     beta_p_col = rep(1:ncol(X), 5)
-
   )
 
   data <- list(
@@ -155,11 +179,3 @@ prep_nimble <- function(N, take, X){
     )
   )
 }
-
-
-
-
-
-
-
-
