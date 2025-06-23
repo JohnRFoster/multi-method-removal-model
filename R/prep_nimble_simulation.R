@@ -103,6 +103,7 @@ prep_nimble <- function(N, take, X){
     n_method = 5,
     n_time_prop = n_time_prop,
     n_betaP = 15,
+    n_units = nrow(N),
     nH = as.matrix(nH),
     nH_p = nH_p,
     log_pi = log(pi),
