@@ -1,3 +1,5 @@
+# build nimble inits for simulations
+
 inits <- function(data, constants, dir = NULL) {
   source("R/calc_log_potential_area.R")
   with(append(data, constants), {

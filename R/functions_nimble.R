@@ -1,3 +1,5 @@
+# nimble helper functions
+
 calc_log_potential_area <- nimbleFunction(
   run = function(
     log_rho = double(1),

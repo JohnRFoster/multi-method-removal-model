@@ -1,3 +1,5 @@
+# the removal model
+
 library(nimble)
 
 modelCode <- nimbleCode({

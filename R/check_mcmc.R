@@ -1,3 +1,5 @@
+# this function checks for convergence across mcmc chains
+
 check_mcmc <- function(samples, nodes_check, n_mcmc, dest) {
   require(coda)
 

@@ -1,3 +1,5 @@
+# get simulated data ready for nimble
+
 prep_nimble <- function(N, take, X) {
   require(dplyr)
   require(tidyr)

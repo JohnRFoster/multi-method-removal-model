@@ -1,3 +1,5 @@
+# prepare data for nimble, run a test build
+
 prep_and_run_mcmc <- function(
 	informed,
 	post_path,

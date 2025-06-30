@@ -1,3 +1,5 @@
+# run the mcmc for simulations
+
 fit_mcmc <- function(
   cl,
   modelCode,

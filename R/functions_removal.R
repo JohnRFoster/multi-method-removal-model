@@ -1,3 +1,5 @@
+# functions to calculate removals for simulations
+
 determine_removal_order <- function(effort_df) {
   # need to make effort_df long to remove methods not used in multimethod properties
   methods <- effort_df |>
