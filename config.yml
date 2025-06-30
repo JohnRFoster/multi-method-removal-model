@@ -9,6 +9,7 @@ default:
   psi_phi: 5
   max_counties: 15
   n_chains: 3
+  interval: 4
 
 dev:
   data_dir: "data"

@@ -122,14 +122,14 @@ create_start_end <- function(df_take, df_pp) {
 }
 
 # informed hyper parameters for beta distribution on global pig survival
-create_surv_prior <- function(interval, data_repo) {
+create_surv_prior <- function(interval = 4) {
 	require(lubridate)
 	require(readr)
 	require(dplyr)
 	require(tidyr)
 
 	data <- read_csv(
-		file.path(data_repo, "insitu/Vital_Rate_Data.csv"),
+		file.path("data/Vital_Rate_Data.csv"),
 		show_col_types = FALSE
 	)
 
@@ -315,8 +315,6 @@ nimble_constants <- function(
 	)
 
 	prior_hyperparams <- get_prior_hyperparams(
-		informed = informed,
-		posterior_path = posterior_path,
 		data_repo = data_repo
 	)
 
@@ -447,82 +445,4 @@ nimble_inits <- function(constants_nimble, data_nimble, buffer = 1000) {
 			log_zeta = log(zeta)
 		)
 	})
-}
-
-nimble_inits_sample <- function(
-	posterior_file,
-	constants_nimble,
-	data_nimble,
-	buffer = 1000
-) {
-	params <- read_rds(posterior_file)
-	draw <- sample.int(nrow(params), 1)
-	init <- params |> slice(draw)
-
-	get_vec <- function(df, node) {
-		df |>
-			select(contains(node)) |>
-			pivot_longer(cols = everything()) |>
-			pull(value)
-	}
-
-	beta_p_vec <- get_vec(init, "beta_p")
-	beta_p <- matrix(beta_p_vec, 5, 3)
-
-	beta1 <- get_vec(init, "beta1")
-	p_mu <- get_vec(init, "p_mu")
-	phi_mu <- get_vec(init, "phi_mu")
-	psi_phi <- get_vec(init, "psi_phi") + 2
-	log_nu <- get_vec(init, "log_nu")
-	log_gamma <- get_vec(init, "log_gamma")
-	log_rho <- get_vec(init, "log_rho")
-
-	unique_log_areas <- data_nimble$unique_log_areas
-	rem <- constants_nimble$rem
-	n_property <- constants_nimble$n_property
-	nH <- constants_nimble$nH
-	n_time_prop <- constants_nimble$n_time_prop
-	pp_len <- constants_nimble$pp_len
-
-	a <- phi_mu * psi_phi
-	b <- (1 - phi_mu) * psi_phi
-	mean_lpy <- 1
-	mean_ls <- exp(log_nu)
-	zeta <- mean_lpy / 365 * pp_len * mean_ls
-	N <- phi <- lambda <- rep(NA, max(nH, na.rm = TRUE))
-	n_init <- rep(NA, n_property)
-	for (i in 1:n_property) {
-		n_init[i] <- round(exp(unique_log_areas[i])) + sum(rem[i, ], na.rm = TRUE)
-		# if(n_init[i] > 5000) n_init[i] <- rpois(1, 500)
-		N[nH[i, 1]] <- n_init[i]
-		for (j in 2:n_time_prop[i]) {
-			phi[nH[i, j - 1]] <- max(0.05, min(rbeta(1, a, b), 0.95))
-			z <- N[nH[i, j - 1]] - rem[i, j - 1]
-			z <- max(1, z)
-			lambda[nH[i, j - 1]] <- z * zeta / 2 + z * phi[nH[i, j - 1]]
-
-			N[nH[i, j]] <- rpois(1, lambda[nH[i, j - 1]])
-		}
-	}
-
-	list(
-		log_lambda_1 = log(n_init + buffer),
-		beta_p = beta_p,
-		beta1 = beta1,
-		p_mu = p_mu,
-		p_unique = boot::inv.logit(p_mu),
-		phi_mu = phi_mu,
-		psi_phi = psi_phi,
-		a_phi = a,
-		b_phi = b,
-		N = N + buffer,
-		# lambda = lambda + buffer,
-		log_nu = log_nu,
-		nu = exp(log_nu),
-		log_gamma = log_gamma,
-		log_rho = log_rho,
-		phi = phi,
-		zeta = zeta,
-		log_zeta = log(zeta)
-	)
 }
