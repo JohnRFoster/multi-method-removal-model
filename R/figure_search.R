@@ -113,39 +113,6 @@ g1 <- df |>
 	theme_bw() +
 	theme(legend.position = "none")
 
-get_posterior <- function(df, y) {
-	dfp <- df |>
-		select(starts_with(y)) |>
-		pivot_longer(cols = everything(), names_to = "node", values_to = "y")
-
-	if (grepl("log", y)) {
-		dfp <- dfp |> mutate(y = exp(y))
-	}
-	if (y == "log_nu") {
-		dfp <- dfp |> mutate(y = y / 2)
-	}
-	if (grepl("p_mu", y) || grepl("beta1", y)) {
-		dfp <- dfp |> mutate(y = boot::inv.logit(y))
-	}
-
-	dfp
-}
-
-join_summarise_methods <- function(df, df_method_names) {
-	df |>
-		left_join(df_method_names) |>
-		group_by(method) |>
-		summarise(
-			`5%` = quantile(y, 0.05),
-			`25%` = quantile(y, 0.25),
-			`50%` = quantile(y, 0.5),
-			`75%` = quantile(y, 0.75),
-			`95%` = quantile(y, 0.95)
-		) |>
-		ungroup() |>
-		mutate(method = factor(method, levels = c("Prior", method_vector)))
-}
-
 beta1_1 <- get_posterior(params, "beta1")
 beta1_summary <- join_summarise_methods(beta1_1, method_names)
 
