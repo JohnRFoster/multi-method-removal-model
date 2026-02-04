@@ -234,8 +234,8 @@ create_X <- function(df, cols = c("c_road_den", "c_rugged", "c_canopy")) {
 		as.matrix()
 }
 
-get_prior_hyperparams <- function(data_repo = NULL, interval = 4) {
-	survival_prior <- create_surv_prior(interval, data_repo)
+get_prior_hyperparams <- function(interval = 4) {
+	survival_prior <- create_surv_prior(interval)
 
 	hyperparams <- list(
 		log_rho_mu = rep(0, 5),
@@ -267,8 +267,6 @@ get_prior_hyperparams <- function(data_repo = NULL, interval = 4) {
 nimble_constants <- function(
 	df,
 	interval,
-	data_repo,
-	informed,
 	posterior_path = NULL
 ) {
 	# mean litter size year from VerCauteren et al. 2019 pg 63
@@ -314,9 +312,7 @@ nimble_constants <- function(
 		pp_len = interval * 7
 	)
 
-	prior_hyperparams <- get_prior_hyperparams(
-		data_repo = data_repo
-	)
+	prior_hyperparams <- get_prior_hyperparams()
 
 	append(constants, prior_hyperparams)
 }

@@ -34,31 +34,36 @@ firearms_lpa <- function(log_rho, effort_per) {
 }
 
 #'@description Calculate the potential search area from posterior samples for a vector of methods (used in forecasting code)
-#'@param log_rho vector of mcmc samples for rho (log scale), iterations (rows) by method (columns)
-#'@param log_gamma vector of mcmc samples for gamma (log scale), iterations (rows) by method (columns)
-#'@param p_unique vector of mcmc samples for p, iterations (rows) by method (columns)
+#'@param method method used for removal
+#'@param method_params data frame of parameters specific to each method
 #'@param effort_per the effort per unit
 #'@param n_trap_m1 the number of units used minus 1
 
-lpa <- function(method, log_rho, log_gamma, p_unique, effort_per, n_trap_m1) {
-  n_mcmc <- length(log_rho)
-  n_reps <- length(method)
-  log_potential_area <- matrix(NA, n_mcmc, n_reps)
-  for (j in seq_along(method)) {
-    lr <- log_rho[, method[j]]
-    ep <- effort_per[j]
-    tcm1 <- n_trap_m1[j]
-    if (method[j] == 1) {
-      log_potential_area[, j] <- firearms_lpa(lr, ep)
-    } else if (method[j] == 2 | method[j] == 3) {
-      log_potential_area[, j] <- aerial_lpa(lr, ep)
-    } else if (method[j] == 4 | method[j] == 5) {
-      lg <- log_gamma[, method[j] - 3]
-      p <- p_unique[, method[j] - 2]
-      log_potential_area[, j] <- trap_snare_lpa(lr, lg, p, ep, tcm1)
+lpa <- function(method, method_params, effort_per, n_trap_m1) {
+  n_ens <- nrow(method_params)
+  log_potential_area <- numeric(n_ens)
+  for (e in seq_len(n_ens)) {
+    if (method == "TRAPS" || method == "SNARES") {
+      log_potential_area[e] <- trap_snare_lpa(
+        log_rho = method_params$log_rho[e],
+        log_gamma = method_params$log_gamma[e],
+        p_unique = nimble::ilogit(method_params$p_mu[e]),
+        effort_per = effort_per,
+        n_trap_m1 = n_trap_m1
+      )
+    } else if (method == "HELICOPTER" || method == "FIXED_WING") {
+      log_potential_area[e] <- aerial_lpa(
+        log_rho = method_params$log_rho[e],
+        effort_per = effort_per
+      )
+    } else if (method == "FIREARMS") {
+      log_potential_area[e] <- firearms_lpa(
+        log_rho = method_params$log_rho[e],
+        effort_per = effort_per
+      )
     }
   }
-  return(log_potential_area)
+  log_potential_area
 }
 
 #'@description calculate the capture probability for a removal event
@@ -100,12 +105,13 @@ data_posteriors <- function(samples, constants, data) {
   require(dplyr)
   require(nimble)
   require(stringr)
-
+  samples <- as.matrix(samples)
   D <- append(constants, data)
 
   post <- with(D, {
     log_potential_area <- matrix(NA, nrow(samples), n_survey)
     y_pred <- matrix(NA, nrow(samples), n_survey)
+    y_lambda <- matrix(NA, nrow(samples), n_survey)
 
     pattern <- "(?<!beta_)p\\[\\d*\\]"
     p_detect <- str_detect(colnames(samples), pattern)
@@ -186,14 +192,14 @@ data_posteriors <- function(samples, constants, data) {
     }
 
     for (i in 1:n_survey) {
-      N <- as.numeric(samples[, paste0("N[", nH_p[i], "]")])
-      y_pred[, i] <- rpois(length(N), N * p[, i])
+      N <- samples[, paste0("N[", nH_p[i], "]")]
+      y_lambda[, i] <- (N - y_sum[i]) * p[, i]
+      y_pred[, i] <- rpois(length(N), y_lambda[, i])
     }
-
-    q <- c(0.05, 0.25, 0.5, 0.75, 0.95)
 
     list(
       y_pred = y_pred,
+      y_lambda = y_lambda,
       p_pred = p,
       potential_area_pred = exp(log_potential_area),
       theta_pred = exp(log_theta)
