@@ -103,7 +103,7 @@ plot_data <- directions_data |>
 method_shapes <- plot_data |>
 	select(methods_used) |>
 	mutate(
-		methods_used = str_replace(methods_used, "Firearms", "Sharpshooting")
+		methods_used = str_replace(methods_used, "Firearms", "Ground-shooting")
 	) |>
 	distinct() |>
 	mutate(shape = seq_len(n()))
@@ -111,7 +111,7 @@ method_shapes <- plot_data |>
 plot_data |>
 	mutate(
 		methods_used = as.factor(methods_used),
-		methods_used = str_replace(methods_used, "Firearms", "Sharpshooting")
+		methods_used = str_replace(methods_used, "Firearms", "Ground-shooting")
 	) |>
 	ggplot() +
 	aes(x = end_dates) +
@@ -158,7 +158,7 @@ plot_data |>
 	)
 
 ggsave(
-	file.path(out_path, "dataTimeSeries"),
+	file.path(out_path, "dataTimeSeries.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "cm",

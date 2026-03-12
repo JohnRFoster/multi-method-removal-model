@@ -131,20 +131,33 @@ ylab <- "Binned effort per unit"
 
 m <- "norm_bias_density"
 nb_lab <- "nBias"
+
+cats <- cats |>
+	mutate(
+		methods_used = if_else(
+			methods_used == "Sharpshooting",
+			"Ground-shooting",
+			methods_used
+		)
+	)
+
 g1 <- my_tile(cats, m, x, y) +
 	labs(x = xlab, y = ylab, fill = nb_lab) +
-	theme(strip.background.y = element_blank(), strip.text = element_blank())
+	theme(
+		strip.background.y = element_blank(),
+		strip.text = element_blank()
+	)
 
 m <- "nm_rmse_density"
 nrmse_lab <- "nRMSE"
 g2 <- my_tile(cats, m, x, y) +
 	labs(x = xlab, y = "", fill = nrmse_lab) +
-	theme(axis.text.y = element_blank())
+	theme(axis.text.y = element_blank(), strip.text = element_text(size = 8))
 
 ggarrange(g1, g2, ncol = 2, labels = "AUTO")
 
 ggsave(
-	file.path(out_path, "simulationNbiasNrmseHeatmap"),
+	file.path(out_path, "simulationNbiasNrmseHeatmap.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "in",

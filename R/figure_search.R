@@ -91,7 +91,7 @@ dist_colors <- c("Posterior" = "gray")
 
 g1 <- df |>
 	filter(value == "Potential area", distribution == "Posterior") |>
-	mutate(method = if_else(method == "Firearms", "Sharpshooting", method)) |>
+	mutate(method = if_else(method == "Firearms", "Ground-shooting", method)) |>
 	ggplot() +
 	aes(
 		x = effort_per,
@@ -117,7 +117,7 @@ beta1_1 <- get_posterior(params, "beta1")
 beta1_summary <- join_summarise_methods(beta1_1, method_names)
 
 g2 <- beta1_summary |>
-	mutate(method = if_else(method == "Firearms", "Sharpshooting", method)) |>
+	mutate(method = if_else(method == "Firearms", "Ground-shooting", method)) |>
 	ggplot() +
 	aes(x = `50%`, y = method) +
 	geom_linerange(aes(xmin = `5%`, xmax = `95%`), linewidth = 0.5) +
@@ -132,7 +132,7 @@ g2 <- beta1_summary |>
 ggarrange(g1, g2, nrow = 2, labels = c("A", "B"), heights = c(2, 1))
 
 ggsave(
-	file.path(out_path, "methodEfficiency"),
+	file.path(out_path, "methodEfficiency.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "in",
