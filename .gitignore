@@ -52,3 +52,5 @@ rsconnect/
 data/
 simulation/
 plots/
+
+.lintr
