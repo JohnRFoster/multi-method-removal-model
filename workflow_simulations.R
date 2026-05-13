@@ -21,7 +21,7 @@
 # --------------------------------------------------------------------
 
 start <- Sys.time()
-config_name <- "dev"
+config_name <- "hpc_production"
 config <- config::get(config = config_name)
 
 library(nimble)
