@@ -1,10 +1,5 @@
 default:
   model_dir: "multi-method"
-  start_density: 0.3
-  # start_density: 1.475
-  # start_density: 2.65
-  # start_density: 3.825
-  # start_density: 5
   phi_mu: 0.78
   psi_phi: 5
   max_counties: 15
