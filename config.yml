@@ -1,9 +1,9 @@
 default:
-  model_dir: "betaSurvival_uniqueAreaTrapSnare"
-  # start_density: 0.3
+  model_dir: "multi-method"
+  start_density: 0.3
   # start_density: 1.475
   # start_density: 2.65
-  start_density: 3.825
+  # start_density: 3.825
   # start_density: 5
   phi_mu: 0.78
   psi_phi: 5
@@ -22,7 +22,7 @@ dev:
   n_iter: 1000
 
 hpc_production:
-  inherits: hpc_test
+  inherits: dev
   dev_dir: "production"
   n_pp: 40
   n_mcmc: 1000
