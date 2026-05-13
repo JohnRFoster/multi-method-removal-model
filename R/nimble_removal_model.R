@@ -57,7 +57,7 @@ modelCode <- nimbleCode({
     log_theta[i] <- log(
       ilogit(
         beta1[method[i]] +
-          inprod(X_p[i, 1:m_p], beta_p[method[i], 1:m_p])
+          inprod(X_p[county[i], 1:m_p], beta_p[method[i], 1:m_p])
       )
     ) +
       min(0, log_potential_area[i] - log_survey_area_km2[i])
@@ -73,7 +73,7 @@ modelCode <- nimbleCode({
 
   # the probability an individual is captured after the first survey
   for (i in 1:n_not_first_survey) {
-    log(p[not_first_survey[i]]) <- log_theta[start[not_first_survey[i]]] +
+    log(p[not_first_survey[i]]) <- log_theta[not_first_survey[i]] +
       sum(log(
         1 - exp(log_theta[start[not_first_survey[i]]:end[not_first_survey[i]]])
       ))
