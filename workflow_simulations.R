@@ -52,7 +52,7 @@ df <- df |>
 
 all_sims <- expand_grid(
   start_density = c(0.3, 1.475, 2.65, 3.825, 5),
-  sim_id = 1:500,
+  sim_id = 1:300,
 )
 
 arg_id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
@@ -68,6 +68,7 @@ if (is.na(arg_id)) {
 
 config$start_density <- all_sims$start_density[arg_id]
 
+set.seed(arg_id)
 message("Task ID: ", task_id)
 
 source("R/run_simulation.R")
