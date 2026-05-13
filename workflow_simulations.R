@@ -49,11 +49,24 @@ df <- df |>
 # meant to be run in parallel on an hpc
 # the array number gets assigned to task_id
 
-args <- commandArgs(trailingOnly = TRUE)
-task_id <- args[1]
-if (is.na(task_id)) {
+all_sims <- expand_grid(
+  start_density = c(0.3, 1.475, 2.65, 3.825, 5),
+  sim_id = 1:500,
+)
+
+arg_id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
+if (is.na(arg_id)) {
+  # for testing locally
   task_id <- 1
-} # for testing locally
+  arg_id <- 1
+} else {
+  task_id <- all_sims |>
+    slice(arg_id) |>
+    pull(sim_id)
+}
+
+config$start_density <- all_sims$start_density[arg_id]
+
 message("Task ID: ", task_id)
 
 source("R/run_simulation.R")
