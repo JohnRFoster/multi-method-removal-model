@@ -21,9 +21,7 @@ prep_and_run_mcmc <- function(
 
 	constants <- nimble_constants(
 		df = df,
-		interval = 4,
-		data_repo = data_repo,
-		informed = informed
+		interval = 4
 	)
 
 	data <- nimble_data(df)
