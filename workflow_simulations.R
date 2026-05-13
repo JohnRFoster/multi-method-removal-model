@@ -20,6 +20,7 @@
 #
 # --------------------------------------------------------------------
 
+start <- Sys.time()
 config_name <- "dev"
 config <- config::get(config = config_name)
 
@@ -80,6 +81,6 @@ out_list <- run_simulation(config, df, task_id)
 # collate_mcmc_output(config, sim)
 
 message("\nRun time: ")
-print(Sys.time() - start)
+print(round(Sys.time() - start, 1))
 
 message("\n\nDONE!")
