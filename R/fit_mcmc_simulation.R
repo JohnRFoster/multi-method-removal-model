@@ -93,6 +93,7 @@ fit_mcmc <- function(
       Cmcmc,
       niter = n_iter,
       nchains = 1,
+      thin = 10,
       nburnin = round(n_iter / 2),
       samplesAsCodaMCMC = TRUE
     )
