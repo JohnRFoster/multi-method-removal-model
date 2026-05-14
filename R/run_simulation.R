@@ -204,7 +204,7 @@ run_simulation <- function(config, df, task_id) {
   )
 
   source("R/fit_mcmc_simulation.R")
-  cl <- makeCluster(n_chains)
+  cl <- makeCluster(n_chains, type = config$cluster_type)
   samples <- fit_mcmc(
     cl,
     modelCode,

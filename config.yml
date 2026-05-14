@@ -5,8 +5,7 @@ default:
   max_counties: 15
   n_chains: 3
   interval: 4
-
-dev:
+  cluster_type: "PSOCK"
   data_dir: "data"
   project_dir: "simulation"
   out_dir: "out"
@@ -15,6 +14,8 @@ dev:
   n_pp: 20
   n_mcmc: 500
   n_iter: 1000
+
+hpc_dev:
 
 hpc_production:
   inherits: dev
