@@ -55,6 +55,8 @@ all_sims <- expand_grid(
   sim_id = 1:300,
 )
 
+all_sims <- all_sims |> slice(1001:1500)
+
 arg_id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(arg_id)) {
   # for testing locally
