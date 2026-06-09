@@ -340,7 +340,7 @@ get_tasks <- function(density_tasks, path, nodes) {
 		all_methods <- tibble()
 		all_area <- tibble()
 		all_theta <- tibble()
-		# all_p <- tibble()
+		all_p <- tibble()
 		all_psrf <- tibble()
 		all_land_cover <- tibble()
 	}
