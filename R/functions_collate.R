@@ -484,7 +484,7 @@ get_tasks <- function(density_tasks, path, nodes) {
 		ls$all_methods <- all_methods
 		ls$all_area <- all_area
 		ls$all_theta <- all_theta
-		# ls$all_p <- all_p
+		ls$all_p <- all_p
 		ls$all_psrf <- all_psrf
 		ls$all_land_cover <- all_land_cover
 	}
