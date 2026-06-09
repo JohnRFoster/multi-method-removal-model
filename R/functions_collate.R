@@ -405,13 +405,13 @@ get_tasks <- function(density_tasks, path, nodes) {
 				task_id,
 				start_density
 			)
-			# all_p <- bind_post_summaries(
-			# 	all_p,
-			# 	"posterior_p",
-			# 	rds,
-			# 	task_id,
-			# 	start_density
-			# )
+			all_p <- bind_post_summaries(
+				all_p,
+				"posterior_p",
+				rds,
+				task_id,
+				start_density
+			)
 			all_psrf <- bind_psrf(all_psrf, rds, task_id, start_density)
 			all_land_cover <- bind_land_cover(
 				all_land_cover,
