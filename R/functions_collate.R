@@ -427,6 +427,17 @@ get_tasks <- function(density_tasks, path, nodes) {
 		}
 
 		if (nodes == "take") {
+			# need to calculate p and take from joint posterior samples of parameters and N
+			samples <- rds$posterior_samples
+			constants <- rds$constants
+			data <- rds$data
+
+			post <- data_posteriors(samples, constants, data)
+
+			rds$posterior_take = post$y_pred
+			rds$posterior_p = post$p_pred
+			write_rds(rds, rds_file)
+
 			y_long <- get_y(rds, task_id, start_density)
 			rds_take <- get_take(rds, task_id, start_density)
 
