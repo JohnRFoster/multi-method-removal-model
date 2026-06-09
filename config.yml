@@ -18,6 +18,7 @@ default:
 hpc_dev:
 
 hpc_production:
+  top_dir: "/project/nwrc/ceah/projects/feral_swine/multi-method-removal-model"
   inherits: dev
   dev_dir: "production"
   n_pp: 40
