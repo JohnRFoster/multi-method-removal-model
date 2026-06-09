@@ -10,6 +10,7 @@ message("=== TAKE ===")
 
 # will get config_name from here
 source("R/functions_collate.R")
+source("R/functions_predict.R")
 config <- config::get(config = config_name)
 
 args <- commandArgs(trailingOnly = TRUE)
