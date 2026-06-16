@@ -101,7 +101,7 @@ conduct_removals <- function(
       p <- exp(log_theta[1])
       n_avail <- N
     } else {
-      p <- exp(log_theta[1] + sum(log(1 - exp(log_theta[1:(r - 1)]))))
+      p <- exp(log_theta[r] + sum(log(1 - exp(log_theta[1:(r - 1)]))))
       n_avail <- N - sum(C[1:(r - 1)])
     }
 
