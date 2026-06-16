@@ -53,7 +53,8 @@ df <- df |>
 all_sims <- expand_grid(
   start_density = c(0.3, 1.475, 2.65, 3.825, 5),
   sim_id = 1:200,
-)
+) |>
+  arrange(sim_id, start_density)
 
 arg_id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(arg_id)) {
