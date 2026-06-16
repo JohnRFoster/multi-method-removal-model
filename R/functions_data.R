@@ -246,6 +246,14 @@ subset_data_for_development <- function(df) {
 		rename(ts_length = delta) |>
 		select(-primary_period)
 
+	acceptable_metrics <- read_csv("data/good_property_metrics.csv")
+
+	get_val <- function(df, m, v) {
+		df |>
+			filter(metric == m) |>
+			pull(v)
+	}
+
 	best_properties <- df |>
 		group_by(propertyID, property_area_km2) |>
 		summarise(
@@ -259,21 +267,22 @@ subset_data_for_development <- function(df) {
 		left_join(observed_pp) |>
 		mutate(prop_observed = n_observed_pp / ts_length) |>
 		filter(
-			property_area_km2 >= 4.05,
-			property_area_km2 <= 405,
-			take >= 13,
-			take <= 858,
-			n_total_events >= 7,
-			n_total_events <= 117,
-			n_observed_pp >= 2,
-			n_observed_pp <= 18,
-			ts_length >= 3,
-			ts_length <= 34,
-			prop_observed >= 0.24,
-			effort >= 13.9,
-			effort <= 263,
-			unit_count >= 10,
-			unit_count <= 653
+			property_area_km2 >= get_val(acceptable_metrics, "property_area", "qmin"),
+			property_area_km2 <= get_val(acceptable_metrics, "property_area", "qmax"),
+			take >= get_val(acceptable_metrics, "take", "qmin"),
+			take <= get_val(acceptable_metrics, "take", "qmax"),
+			n_total_events >= get_val(acceptable_metrics, "n_total_events", "qmin"),
+			n_total_events <= get_val(acceptable_metrics, "n_total_events", "qmax"),
+			n_observed_pp >= get_val(acceptable_metrics, "n_observed_pp", "qmin"),
+			n_observed_pp <= get_val(acceptable_metrics, "n_observed_pp", "qmax"),
+			ts_length >= get_val(acceptable_metrics, "ts_length", "qmin"),
+			ts_length <= get_val(acceptable_metrics, "ts_length", "qmax"),
+			prop_observed >=
+				get_val(acceptable_metrics, "proportion_observed", "qmin"),
+			effort >= get_val(acceptable_metrics, "effort", "qmin"),
+			effort <= get_val(acceptable_metrics, "effort", "qmax"),
+			unit_count >= get_val(acceptable_metrics, "unit_count", "qmin"),
+			unit_count <= get_val(acceptable_metrics, "unit_count", "qmax")
 		)
 
 	property_order <- best_properties$propertyID

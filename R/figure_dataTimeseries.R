@@ -11,9 +11,10 @@ source("R/functions_figures.R")
 top_dir <- "data"
 if_dir <- "1_posterior"
 
-posterior_path <- file.path(top_dir, if_dir, "modelData.rds")
-data <- read_rds(posterior_path) |>
+data_for_nimble <- read_csv(file.path("../data-store/masked_mis_data.csv")) |>
 	mutate(
+		property = propertyID,
+		county = county_code,
 		method = if_else(method == "FIREARMS", "Firearms", method),
 		method = if_else(method == "FIXED WING", "Fixed wing", method),
 		method = if_else(method == "HELICOPTER", "Helicopter", method),
@@ -21,30 +22,61 @@ data <- read_rds(posterior_path) |>
 		method = if_else(method == "TRAPS", "Trap", method)
 	)
 
-posterior_path <- file.path(top_dir, if_dir, "densitySummaries.rds")
-density <- read_rds(posterior_path)
+all_pp <- boaR:::create_all_primary_periods(data_for_nimble) |>
+	select(-timestep)
 
-n_return <- data |>
-	select(propertyID, primary_period, method) |>
+property_info <- data_for_nimble |>
+	select(property, primary_period, property_area_km2) |>
+	left_join(all_pp) |>
+	distinct()
+
+posterior_path <- file.path(top_dir, if_dir, "stateSamples.rds")
+abundance <- read_rds(posterior_path)
+
+abundance_long <- abundance |>
+	pivot_longer(cols = everything(), names_to = "node", values_to = "value") |>
+	mutate(n_id = as.numeric(stringr::str_extract(node, "(?<=\\[)\\d*(?=\\])")))
+
+density_stats <- left_join(abundance_long, property_info) |>
+	mutate(density = value / property_area_km2) |>
+	group_by(
+		node,
+		n_id,
+		property,
+		primary_period,
+		property_area_km2
+	) |>
+	summarise(
+		mean = mean(density),
+		variance = var(density),
+		`0.025` = quantile(density, 0.025),
+		`0.05` = quantile(density, 0.05),
+		`0.1` = quantile(density, 0.1),
+		`0.25` = quantile(density, 0.25),
+		`0.5` = quantile(density, 0.5),
+		`0.75` = quantile(density, 0.75),
+		`0.9` = quantile(density, 0.9),
+		`0.95` = quantile(density, 0.95),
+		`0.975` = quantile(density, 0.975)
+	) |>
+	ungroup()
+
+n_return <- data_for_nimble |>
+	select(property, primary_period, method) |>
 	distinct() |>
 	pivot_wider(names_from = method, values_from = method) |>
-	unite(method, -c(propertyID, primary_period), sep = ", ", na.rm = TRUE) |>
-	group_by(propertyID, method) |>
+	unite(method, -c(property, primary_period), sep = ", ", na.rm = TRUE) |>
+	group_by(property, method) |>
 	mutate(return_interval = c(0, diff(primary_period))) |>
 	ungroup() |>
 	rename(methods_used = method)
 
-model_data <- data |>
+model_data <- data_for_nimble |>
 	group_by(
-		propertyID,
-		agrp_prp_id,
+		property,
 		start_dates,
 		end_dates,
 		st_name,
-		cnty_name,
-		farm_bill,
-		alws_agrprop_id,
-		property,
 		primary_period,
 		property_area_km2,
 		county_code
@@ -52,17 +84,16 @@ model_data <- data |>
 	summarise(total_take = sum(take), total_effort_per = sum(effort_per)) |>
 	ungroup() |>
 	mutate(
-		take_density = total_take / property_area_km2,
-		farm_bill = if_else(is.na(farm_bill), 0, farm_bill)
+		take_density = total_take / property_area_km2
 	) |>
-	left_join(density) |>
+	left_join(density_stats) |>
 	left_join(n_return)
 
 all_slopes_data <- tibble()
-all_props_data <- unique(model_data$propertyID)
+all_props_data <- unique(model_data$property)
 
 for (j in seq_along(all_props_data)) {
-	tmp <- model_data |> filter(propertyID == all_props_data[j])
+	tmp <- model_data |> filter(property == all_props_data[j])
 
 	if (nrow(tmp) == 1) {
 		next
@@ -73,7 +104,7 @@ for (j in seq_along(all_props_data)) {
 	slope <- summary(m)$coefficients[2]
 
 	sp <- tibble(
-		propertyID = all_props_data[j],
+		property = all_props_data[j],
 		lambda = slope
 	)
 
@@ -89,16 +120,16 @@ directions_data <- model_data |>
 	)
 
 directions_data |>
-	select(propertyID, direction) |>
+	select(property, direction) |>
 	distinct() |>
 	count(direction)
 
-id1 <- "352492-347989" # decreasing
-id2 <- "359719-356143" # increasing
-id3 <- "361285-357745" # stable
+id1 <- "4" # decreasing or 4x, 5x, 6, 94, 51
+id2 <- "53" # increasing or 53x, 55x, 64
+id3 <- "79" # stable or 1x, 28, 79x
 
 plot_data <- directions_data |>
-	filter(propertyID %in% c(id1, id2, id3))
+	filter(property %in% c(id1, id2, id3))
 
 method_shapes <- plot_data |>
 	select(methods_used) |>
@@ -158,7 +189,7 @@ plot_data |>
 	)
 
 ggsave(
-	file.path(out_path, "dataTimeSeries.jpeg"),
+	file.path(out_path, "dataTimeSeries-v2.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "cm",

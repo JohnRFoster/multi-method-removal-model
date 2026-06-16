@@ -80,7 +80,7 @@ ggarrange(
 )
 
 ggsave(
-	file.path(out_path, "biasRMSLEDensity"),
+	file.path(out_path, "biasRMSLEDensity-v2"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "in",

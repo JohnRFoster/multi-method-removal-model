@@ -157,7 +157,7 @@ g2 <- my_tile(cats, m, x, y) +
 ggarrange(g1, g2, ncol = 2, labels = "AUTO")
 
 ggsave(
-	file.path(out_path, "simulationNbiasNrmseHeatmap.jpeg"),
+	file.path(out_path, "simulationNbiasNrmseHeatmap-v2.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "in",

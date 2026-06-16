@@ -31,9 +31,10 @@ method_names <- tibble(
 	left_join(method_lookup) |>
 	left_join(land_lookup)
 
-posterior_path <- file.path(top_dir, if_dir, "modelData.rds")
-data <- read_rds(posterior_path) |>
+data <- read_csv(file.path("../data-store/masked_mis_data.csv")) |>
 	mutate(
+		property = propertyID,
+		county = county_code,
 		method = if_else(method == "FIREARMS", "Firearms", method),
 		method = if_else(method == "FIXED WING", "Fixed wing", method),
 		method = if_else(method == "HELICOPTER", "Helicopter", method),
@@ -67,7 +68,6 @@ pa_snare_post1 <- potential_area(params, "Snare", "potential area") |>
 
 pa_traps_post1 <- potential_area(params, "Trap", "potential area") |>
 	mutate(distribution = "Posterior")
-
 
 my_theme <- function(s = 14) {
 	theme(
@@ -132,7 +132,7 @@ g2 <- beta1_summary |>
 ggarrange(g1, g2, nrow = 2, labels = c("A", "B"), heights = c(2, 1))
 
 ggsave(
-	file.path(out_path, "methodEfficiency.jpeg"),
+	file.path(out_path, "methodEfficiency-v2.jpeg"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "in",

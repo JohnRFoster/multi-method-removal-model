@@ -7,14 +7,23 @@ library(stringr)
 
 source("R/functions_figures.R")
 
-analysis_dir <- "../pigs-simulation/analysis"
-model_dir <- "betaSurvival_uniqueAreaTrapSnare"
-path <- file.path(analysis_dir, model_dir)
+path <- "data"
 density_dirs <- paste0("density_", c(0.3, 1.475, 2.65, 3.825, 5))
 
 message("Get abundance summaries")
 f_name <- "abundance_summaries.rds"
 df <- map_files2(density_dirs, f_name)
+
+abundance_recovered <- df |>
+	mutate(
+		recovered = if_else(
+			abundance >= low_abundance & abundance <= high_abundance,
+			1,
+			0
+		)
+	)
+
+sum(abundance_recovered$recovered) / nrow(abundance_recovered)
 
 # create property ID for easier joining
 property_ids <- df |>
@@ -77,6 +86,7 @@ extant_properties <- density_take |>
 all_slopes <- tibble()
 all_props <- extant_properties
 
+pb <- txtProgressBar(min = 1, max = length(all_props), style = 3)
 for (j in seq_along(all_props)) {
 	tmp <- density_take |> filter(property_id == all_props[j])
 
@@ -94,7 +104,9 @@ for (j in seq_along(all_props)) {
 	)
 
 	all_slopes <- bind_rows(all_slopes, sp)
+	setTxtProgressBar(pb, j)
 }
+close(pb)
 
 density_recovered <- density_take |>
 	mutate(
@@ -118,12 +130,18 @@ table(directions$direction)
 summary(directions$lambda)
 
 directions |>
+	#filter(obs_flag == 1) |>
 	group_by(direction) |>
-	summarise(per_recovered = round(sum(recovered) / n() * 100, 2))
+	reframe(
+		n = n(),
+		n_recovered = sum(recovered),
+		prop_recovered = n_recovered / n
+	)
 
-id1 <- "3.825-89-94" # steady decline
-id2 <- "5-54-94" # steady incline
-id3 <- "3.825-118-61" # steady
+
+id1 <- "5-161-15"
+id2 <- "1.475-13-3"
+id3 <- "2.65-280-92"
 
 plot_df <- directions |>
 	filter(property_id %in% c(id1, id2, id3))
@@ -131,11 +149,25 @@ plot_df <- directions |>
 method_shapes <- plot_df |>
 	filter(obs_flag == 1) |>
 	select(methods_used) |>
+	mutate(
+		methods_used = stringr::str_replace(
+			methods_used,
+			"Firearms",
+			"Ground-shooting"
+		)
+	) |>
 	distinct() |>
 	mutate(shape = 1:n())
 
 plot_df |>
-	mutate(methods_used = as.factor(methods_used)) |>
+	mutate(
+		methods_used = stringr::str_replace(
+			methods_used,
+			"Firearms",
+			"Ground-shooting"
+		),
+		methods_used = as.factor(methods_used)
+	) |>
 	group_by(property_id) |>
 	mutate(
 		obs_type = if_else(obs_flag == 1, "Observed", "Not observed"),
@@ -184,7 +216,7 @@ plot_df |>
 	)
 
 ggsave(
-	file.path("plots", "simulationTimeSeries"),
+	file.path("plots", "simulationTimeSeries-v2"),
 	dpi = "retina",
 	device = "jpeg",
 	units = "cm",
