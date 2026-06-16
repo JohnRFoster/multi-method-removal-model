@@ -46,7 +46,7 @@ get_path <- function(type, config_name, task_id) {
 			density_dir
 		)
 	}
-	return(path)
+	path
 }
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -66,7 +66,7 @@ bind_samples <- function(all_bind, ls, t_id, dens) {
 
 get_y <- function(ls, t_id, dens) {
 	y_pred <- ls$posterior_take
-	colnames(y_pred) <- 1:ncol(y_pred)
+	colnames(y_pred) <- seq_len(ncol(y_pred))
 	y_pred |>
 		as_tibble() |>
 		pivot_longer(
@@ -142,14 +142,14 @@ take_error_by_property <- function(y_long) {
 get_take <- function(ls, t_id, dens) {
 	ls$take |>
 		add_ids(t_id, dens) |>
-		mutate(p_id = 1:n())
+		mutate(p_id = seq_len(n()))
 }
 
 bind_post_summaries <- function(all_bind, node, ls, t_id, dens) {
 	df <- ls[[node]]
 	tb <- as_tibble(df) |>
 		add_ids(t_id, dens) |>
-		mutate(p_id = 1:n(), parameter = node)
+		mutate(p_id = seq_len(n()), parameter = node)
 	bind_rows(all_bind, tb)
 }
 
@@ -169,8 +169,8 @@ bind_N <- function(all_bind, ls, t_id, dens) {
 bind_beta_p <- function(all_bind, ls, t_id, dens) {
 	# need a lookup table for known data model covariates
 	bH <- tibble(
-		method_idx = rep(1:nrow(ls$beta_p), ncol(ls$beta_p)),
-		position = rep(1:ncol(ls$beta_p), each = nrow(ls$beta_p)),
+		method_idx = rep(seq_len(nrow(ls$beta_p)), ncol(ls$beta_p)),
+		position = rep(seq_len(ncol(ls$beta_p)), each = nrow(ls$beta_p)),
 		actual = as.numeric(ls$beta_p)
 	) |>
 		add_ids(t_id, dens)
@@ -188,7 +188,7 @@ bind_land_cover <- function(all_bind, ls, t_id, dens) {
 	colnames(land_cover) <- c("c_road_den", "c_rugged", "c_canopy")
 	land_cover <- land_cover |>
 		as_tibble() |>
-		mutate(county = 1:n()) |>
+		mutate(county = seq_len(n())) |>
 		add_ids(t_id, dens)
 	bind_rows(all_bind, land_cover)
 }
@@ -511,5 +511,5 @@ get_tasks <- function(density_tasks, path, nodes) {
 		ls$all_by_property <- all_by_property
 	}
 
-	return(ls)
+	ls
 }
