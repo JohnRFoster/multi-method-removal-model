@@ -108,10 +108,10 @@ run_simulation <- function(config, df, task_id) {
     p_unique = c(NA, NA, NA, runif(2)),
     rho = c(
       runif(1, 0.01, 5), # firearms
-      runif(1, 1, 200), # fixed wing
-      runif(1, 1, 200), # helicopter
-      runif(1, 0.1, 15), # snare; gamma[1], p_mu[1]
-      runif(1, 0.1, 15)
+      runif(1, 1, 20), # fixed wing
+      runif(1, 1, 20), # helicopter
+      runif(1, 0.1, 10), # snare; gamma[1], p_mu[1]
+      runif(1, 0.1, 10)
     ), # traps; gamma[2], p_mu[2]
     gamma = c(
       NA,

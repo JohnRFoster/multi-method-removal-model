@@ -1,4 +1,7 @@
 default:
+  file_mis: "insitu/MIS.Effort.Take.All.Methods.Daily.Events.01JUL2024.csv"
+  file_land: 'covariates/FINAL.Process.Model.Observation.Covariates.12Jan2018.csv'
+  data_repo: "../data-store"
   model_dir: "multi-method"
   phi_mu: 0.78
   psi_phi: 5
@@ -23,4 +26,4 @@ hpc_production:
   dev_dir: "production"
   n_pp: 40
   n_mcmc: 1000
-  n_iter: 400000
+  n_iter: 500000
