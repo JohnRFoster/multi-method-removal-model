@@ -370,6 +370,13 @@ get_tasks <- function(density_tasks, path, nodes) {
 
 		if (file.exists(rds_file)) {
 			rds <- read_rds(rds_file)
+			samps <- read_rds(file.path(path, task_id, "parameters_burnin.rds"))
+			samples <- as.matrix(samps)
+			rds$posterior_samples <- samps[sample(
+				nrow(samples),
+				5000,
+				replace = TRUE
+			)]
 		} else {
 			next
 		}
@@ -379,7 +386,7 @@ get_tasks <- function(density_tasks, path, nodes) {
 			mutate(node_names = rownames(rds$psrf)) |>
 			filter(node_names != "psi_phi")
 
-		bad_mcmc <- rds$bad_mcmc | any(psrf$`Point est.` > 1.1)
+		bad_mcmc <- any(psrf$`Point est.` > 1.1)
 
 		if (bad_mcmc) {
 			next
