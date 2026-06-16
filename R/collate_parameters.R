@@ -22,7 +22,7 @@ message("Tasks to collate ", length(density_tasks))
 
 nodes <- "parameters"
 tasks_ls <- get_tasks(density_tasks, read_path, nodes)
-all_samples <- tasks_ls$all_samples
+all_parameter_samples <- tasks_ls$all_parameter_samples
 all_beta_p <- tasks_ls$all_beta_p
 all_methods <- tasks_ls$all_methods
 all_area <- tasks_ls$all_area
@@ -51,7 +51,7 @@ message("\ndata model summaries done\n")
 rm(list = c("all_theta", "all_area", "all_p", "data_model_summaries"))
 gc()
 
-all_param_samples <- all_samples |>
+all_param_samples <- all_parameter_samples |>
 	select(
 		simulation,
 		start_density,
@@ -72,7 +72,7 @@ recovery_list <- list()
 residual_list <- list()
 
 ## capture probability intercepts ------
-beta1_long <- all_samples |>
+beta1_long <- all_param_samples |>
 	select_pivot_longer("beta1") |>
 	mutate(
 		method_idx = as.numeric(str_extract(node, "(?<=\\[)\\d")),
@@ -85,7 +85,7 @@ residual_list$beta1 <- resid_beta1(beta1_long)
 message("\ncapture intercepts done\n")
 
 ## capture probability covariates ------
-beta_p_long <- all_samples |>
+beta_p_long <- all_param_samples |>
 	select_pivot_longer("beta_p") |>
 	mutate(
 		method_idx = as.numeric(str_extract(node, "(?<=\\[)\\d")),
@@ -105,7 +105,7 @@ gH <- all_methods |>
 	mutate(idx = idx - 3) |>
 	rename(actual = gamma)
 
-gamma_long <- all_samples |>
+gamma_long <- all_param_samples |>
 	select_pivot_longer("log_gamma[") |>
 	mutate(idx = as.numeric(str_extract(node, "(?<=\\[)\\d"))) |>
 	mutate(value = exp(value))
@@ -120,7 +120,7 @@ rH <- all_methods |>
 	select(idx, rho, method, simulation) |>
 	rename(actual = rho)
 
-rho_long <- all_samples |>
+rho_long <- all_param_samples |>
 	select_pivot_longer("log_rho[") |>
 	mutate(idx = as.numeric(str_extract(node, "(?<=\\[)\\d"))) |>
 	mutate(value = exp(value))
@@ -137,7 +137,7 @@ pH <- all_methods |>
 	rename(actual = p_unique) |>
 	mutate(idx = idx - 3)
 
-p_mu_long <- all_samples |>
+p_mu_long <- all_param_samples |>
 	select_pivot_longer("p_mu[") |>
 	mutate(idx = as.numeric(str_extract(node, "(?<=\\[)\\d"))) |>
 	mutate(value = ilogit(value))
@@ -149,7 +149,7 @@ message("\nunique area done\n")
 
 ## litter size ------
 actual <- 5.290323
-ls_long <- all_samples |>
+ls_long <- all_param_samples |>
 	select_pivot_longer("log_nu") |>
 	mutate(value = exp(value))
 
@@ -175,14 +175,14 @@ message("\nliter size done\n")
 
 ## survival ------
 actual <- config$phi_mu
-phi_long <- all_samples |>
+phi_long <- all_param_samples |>
 	select_pivot_longer("phi_mu")
 
 recovery_list$phi_mu <- recov_phi(phi_long, actual, all_psrf)
 residual_list$phi_mu <- resid_phi(phi_long, actual)
 
 actual <- config$psi_phi
-psi_phi_long <- all_samples |>
+psi_phi_long <- all_param_samples |>
 	select_pivot_longer("psi_phi")
 
 recovery_list$psi_phi <- recov_phi(psi_phi_long, actual, all_psrf)

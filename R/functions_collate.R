@@ -64,6 +64,12 @@ bind_samples <- function(all_bind, ls, t_id, dens) {
 	bind_rows(all_bind, samples)
 }
 
+bind_parameter_samples <- function(all_bind, ls, t_id, dens) {
+	samples <- ls$parameter_samples |>
+		add_ids(t_id, dens)
+	bind_rows(all_bind, samples)
+}
+
 get_y <- function(ls, t_id, dens) {
 	y_pred <- ls$posterior_take
 	colnames(y_pred) <- seq_len(ncol(y_pred))
@@ -336,6 +342,7 @@ take_calc <- function(df) {
 get_tasks <- function(density_tasks, path, nodes) {
 	if (nodes == "parameters") {
 		all_samples <- tibble()
+		all_parameter_samples <- tibble()
 		all_beta_p <- tibble()
 		all_methods <- tibble()
 		all_area <- tibble()
@@ -370,9 +377,12 @@ get_tasks <- function(density_tasks, path, nodes) {
 
 		if (file.exists(rds_file)) {
 			rds <- read_rds(rds_file)
-			samps <- read_rds(file.path(path, task_id, "parameters_burnin.rds"))
+
+			if (nodes == "parameters") {
+				samps <- read_rds(file.path(path, task_id, "parameters_burnin.rds"))
+			}
 			samples <- as.matrix(samps)
-			rds$posterior_samples <- samps[sample(
+			rds$parameter_samples <- samps[sample(
 				nrow(samples),
 				5000,
 				replace = TRUE
@@ -396,6 +406,12 @@ get_tasks <- function(density_tasks, path, nodes) {
 
 		if (nodes == "parameters") {
 			all_samples <- bind_samples(all_samples, rds, task_id, start_density)
+			all_parameter_samples <- bind_samples(
+				all_parameter_samples,
+				rds,
+				task_id,
+				start_density
+			)
 			all_beta_p <- bind_beta_p(all_beta_p, rds, task_id, start_density)
 			all_methods <- bind_methods(all_methods, rds, task_id, start_density)
 			all_area <- bind_post_summaries(
@@ -487,6 +503,7 @@ get_tasks <- function(density_tasks, path, nodes) {
 	ls <- list()
 	if (nodes == "parameters") {
 		ls$all_samples <- all_samples
+		ls$all_parameter_samples <- all_parameter_samples
 		ls$all_beta_p <- all_beta_p
 		ls$all_methods <- all_methods
 		ls$all_area <- all_area
