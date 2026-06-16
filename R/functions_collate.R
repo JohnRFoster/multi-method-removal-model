@@ -380,10 +380,11 @@ get_tasks <- function(density_tasks, path, nodes) {
 
 			if (nodes == "parameters") {
 				samps <- read_rds(file.path(path, task_id, "parameters_burnin.rds"))
-				samples <- as.matrix(samps)
-				rds$parameter_samples <- samps[sample(
+				samples <- as.matrix(samps[[1]])
+
+				rds$parameter_samples <- samples[sample(
 					nrow(samples),
-					5000,
+					10000,
 					replace = TRUE
 				)]
 			}
