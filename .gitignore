@@ -54,3 +54,4 @@ simulation/
 plots/
 
 .lintr
+scratch.R
