@@ -425,16 +425,7 @@ get_obs_covars <- function(file) {
 			mean.ruggedness = mean_impute(mean.ruggedness),
 			mean.canopy.density = mean_impute(mean.canopy.density)
 		) |>
-		ungroup() |>
-		mutate(
-			c_road_den = center_scale(rural.road.density),
-			c_rugged = center_scale(mean.ruggedness),
-			c_canopy = center_scale(mean.canopy.density)
-		)
-
-	targets::tar_assert_true(!any(is.na(obs_covs$c_road_den)))
-	targets::tar_assert_true(!any(is.na(obs_covs$c_rugged)))
-	targets::tar_assert_true(!any(is.na(obs_covs$c_canopy)))
+		ungroup()
 
 	return(obs_covs)
 }
