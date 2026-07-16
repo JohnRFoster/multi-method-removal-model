@@ -57,7 +57,7 @@ modelCode <- nimbleCode({
     log_theta[i] <- log(
       ilogit(
         beta1[method[i]] +
-          inprod(X_p[county[i], 1:m_p], beta_p[method[i], 1:m_p])
+          inprod(X_p[i, 1:m_p], beta_p[method[i], 1:m_p])
       )
     ) +
       min(0, log_potential_area[i] - log_survey_area_km2[i])
