@@ -8,6 +8,7 @@ default:
   max_counties: 15
   n_chains: 3
   interval: 4
+  params_check: !expr c("beta_p","beta1","log_gamma","log_rho","phi_mu","psi_phi","log_nu","p_mu")
   cluster_type: "PSOCK"
   data_dir: "data"
   project_dir: "simulation"
