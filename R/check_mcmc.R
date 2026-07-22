@@ -14,7 +14,7 @@ library(coda)
 library(ggplot2)
 
 source("R/functions_nimble.R")
-source("R/functions_prep_nimble.R")
+source("R/prep_nimble_data.R")
 
 config_name <- "hpc_dev"
 config <- config::get(config = config_name)
