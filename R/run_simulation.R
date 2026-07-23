@@ -185,6 +185,9 @@ run_simulation <- function(config, df, task_id) {
   constants <- nimble_data$constants
   data <- nimble_data$data
 
+  # reformat X_p so there is one per row in the data (drop county index)
+  data$X_p <- land_cover[constants$county, ]
+
   custom_samplers <- NULL
 
   source("R/nimble_removal_model.R")
