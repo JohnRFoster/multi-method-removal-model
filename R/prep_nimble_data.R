@@ -397,7 +397,8 @@ nimble_inits <- function(constants_nimble, data_nimble, buffer = 1000) {
 			  )
 			),
 			n_method,
-			m_p
+			m_p,
+			byrow = TRUE
 		)
 		p_mu <- jitter(c(0, 2.5))
 		log_gamma <- jitter(c(-1.4, -2.5))
