@@ -240,9 +240,9 @@ run_simulation <- function(config, df, task_id) {
   # warnings()
 
   message("Checking MCMC")
-  source("R/check_mcmc.R")
+  source("R/check_mcmc_simulation.R")
   n_mcmc <- config$n_mcmc
-  check <- check_mcmc(samples, params_check, n_mcmc, dest)
+  check <- check_mcmc_simulation(samples, params_check, n_mcmc, dest)
 
   samples_draw <- check$posterior_samples
 
