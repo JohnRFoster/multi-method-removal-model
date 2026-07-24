@@ -61,6 +61,8 @@ density_stats <- left_join(abundance_long, property_info) |>
 	) |>
 	ungroup()
 
+round(quantile(density_stats$`0.5`, c(0.05, 0.5, 0.95)), 1)
+
 n_return <- data_for_nimble |>
 	select(property, primary_period, method) |>
 	distinct() |>
@@ -124,9 +126,9 @@ directions_data |>
 	distinct() |>
 	count(direction)
 
-id1 <- "4" # decreasing or 4x, 5x, 6, 94, 51
-id2 <- "53" # increasing or 53x, 55x, 64
-id3 <- "79" # stable or 1x, 28, 79x
+id1 <- 2 # Decreasing
+id2 <- 21 # Stable
+id3 <- 47 # Increasing
 
 plot_data <- directions_data |>
 	filter(property %in% c(id1, id2, id3))

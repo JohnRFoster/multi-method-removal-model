@@ -87,3 +87,28 @@ ggsave(
 	width = 6,
 	height = 4
 )
+
+cats_summary |>
+  filter(density_category == "Low",
+         metric == "mbias_density")
+
+cats_summary |>
+  filter(density_category == "High",
+         metric == "mbias_density")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

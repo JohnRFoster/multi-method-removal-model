@@ -139,3 +139,46 @@ ggsave(
 	width = 6,
 	height = 4
 )
+
+
+rho <- get_posterior(params, "log_rho")
+rho_summary <- join_summarise_methods(rho, method_names)
+
+gamma <- get_posterior(params, "log_gamma")
+gamma_summary <- join_summarise_methods(gamma, method_names)
+
+omega <- get_posterior(params, "p_mu")
+omega_summary <- join_summarise_methods(omega, method_names)
+
+beta_p <- params |>
+  select(starts_with("beta_p")) |>
+  pivot_longer(cols = everything(),
+               names_to = "node",
+               values_to = "y")
+
+beta_summary <- beta_p |>
+  left_join(method_names) |>
+  group_by(method, land) |>
+  summarise(`5%` = quantile(y, 0.05),
+            `25%` = quantile(y, 0.25),
+            `50%` = quantile(y, 0.5),
+            `75%` = quantile(y, 0.75),
+            `95%` = quantile(y, 0.95)) |>
+  ungroup() |>
+  mutate(method = factor(method, levels = c("Firearms", "Fixed wing", "Helicopter", "Snare", "Trap")))
+
+title <- element_blank()
+xlab <- "Effect"
+plot_post(beta_summary, xlab, title) +
+  facet_wrap(~ land, scales = "free") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme(legend.position = "none")
+
+ggsave(
+  file.path(out_path, "landcover-v2.jpeg"),
+  dpi = "retina",
+  device = "jpeg",
+  units = "in",
+  width = 6,
+  height = 4
+)

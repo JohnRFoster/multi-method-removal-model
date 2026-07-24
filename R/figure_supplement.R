@@ -345,20 +345,71 @@ ggsave(
 	height = 12
 )
 
+f_name <- "parameterRecovery.rds"
 
-# figure s6 effect of land cover ----
-plot_post <- function(dfg, xlab, title) {
-	dfg |>
-		ggplot() +
-		aes(x = `50%`, xmin = `5%`, xmax = `95%`, y = method) +
-		geom_linerange(position = position_dodge(width = 0.5)) +
-		geom_point(position = position_dodge(width = 0.5), size = 4) +
-		labs(y = "Method", x = xlab, title = title, color = element_blank()) +
-		theme_bw() +
-		my_theme()
+get_files <- function(density_dir, file_name, node) {
+	sim_results <- file.path("data", density_dir)
+	ls <- read_rds(file.path(sim_results, file_name))
+	ls[[node]]
 }
 
-plot_post(beta_summary, xlab, title) +
-	facet_wrap(~land, scales = "free") +
-	geom_vline(xintercept = 0, linetype = "dashed") +
-	theme(legend.position = "none")
+
+# table s6 ----
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "gamma")) |>
+  list_rbind() |>
+  select(start_density, simulation) |>
+  distinct()
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "beta1")) |>
+  list_rbind() |>
+  group_by(node) |>
+  reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "beta_p")) |>
+  list_rbind() |>
+  group_by(node) |>
+  reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "gamma")) |>
+  list_rbind() |>
+  group_by(node) |>
+  reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "rho")) |>
+  list_rbind() |>
+  group_by(node) |>
+  reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+  map(\(x) get_files(x, f_name, "p_mu")) |>
+  list_rbind() |>
+  group_by(node) |>
+  reframe(p = sum(parameter_recovered) / n())
+
+
+# Table s7 ----
+density_dirs |>
+	map(\(x) get_files(x, f_name, "psi_phi")) |>
+	list_rbind() |>
+	reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+	map(\(x) get_files(x, f_name, "phi_mu")) |>
+	list_rbind() |>
+	reframe(p = sum(parameter_recovered) / n())
+
+density_dirs |>
+	map(\(x) get_files(x, f_name, "litter_size")) |>
+	list_rbind() |>
+	reframe(p = sum(parameter_recovered) / n())
+
+
+
+
+

@@ -14,7 +14,7 @@ message("Get abundance summaries")
 f_name <- "abundance_summaries.rds"
 df <- map_files2(density_dirs, f_name)
 
-abundance_recovered <- df |>
+df <- df |>
 	mutate(
 		recovered = if_else(
 			abundance >= low_abundance & abundance <= high_abundance,
@@ -23,7 +23,7 @@ abundance_recovered <- df |>
 		)
 	)
 
-sum(abundance_recovered$recovered) / nrow(abundance_recovered)
+sum(df$recovered) / nrow(df)
 
 # create property ID for easier joining
 property_ids <- df |>
@@ -40,7 +40,8 @@ density <- left_join(df, property_ids) |>
 		high_density,
 		density,
 		obs_flag,
-		start_density
+		start_density,
+		recovered
 	)
 
 message("Get take summaries")
@@ -82,6 +83,16 @@ extant_properties <- density_take |>
 	ungroup() |>
 	filter(density > 0) |>
 	pull(property_id)
+
+density_take |>
+  filter(density > 0) |>
+  group_by(start_density) |>
+  reframe(p = round(sum(recovered) / n(), 3))
+
+density_take |>
+  filter(density == 0) |>
+  group_by(start_density) |>
+  reframe(p = round(sum(recovered) / n(), 3))
 
 all_slopes <- tibble()
 all_props <- extant_properties
@@ -138,10 +149,21 @@ directions |>
 		prop_recovered = n_recovered / n
 	)
 
+get_id <- function(d){
+  set.seed(90)
+  directions |>
+    filter(direction == d,
+           obs_flag == 1) |>
+    group_by(property_id) |>
+    reframe(n = sum(obs_flag)) |>
+    filter(n > 8, n < 12) |>
+    pull(property_id) |>
+    sample(1)
+}
 
-id1 <- "5-161-15"
-id2 <- "1.475-13-3"
-id3 <- "2.65-280-92"
+id1 <- get_id("Decreasing")
+id2 <- get_id("Stable")
+id3 <- get_id("Increasing")
 
 plot_df <- directions |>
 	filter(property_id %in% c(id1, id2, id3))

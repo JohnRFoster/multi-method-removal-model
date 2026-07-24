@@ -164,3 +164,34 @@ ggsave(
 	width = 6,
 	height = 6
 )
+
+
+tmp <- cats |>
+  filter(metric == "norm_bias_density") |>
+  group_by(methods_used, .data[[x]], .data[[y]]) |>
+  summarise(v = mean(value), n = n()) |>
+  ungroup() |>
+  filter(n >= 30)
+
+tmp |>
+  filter(methods_used %in% c("Helicopter", "Snares", "Traps"),
+         density_category != "Low") |>
+  filter(v == min(v) | v == max(v))
+
+tmp |>
+  filter(!methods_used %in% c("Helicopter", "Snares", "Traps"),
+         density_category == "Low") |>
+  filter(v == min(v) | v == max(v))
+
+tmp <- cats |>
+  filter(metric == "nm_rmse_density") |>
+  group_by(methods_used, .data[[x]], .data[[y]]) |>
+  summarise(v = mean(value), n = n()) |>
+  ungroup() |>
+  filter(n >= 30)
+
+tmp |>
+  filter(!methods_used %in% c("Helicopter", "Snares", "Traps"),
+         density_category == "Low") |>
+  filter(v == min(v) | v == max(v))
+
