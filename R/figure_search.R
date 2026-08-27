@@ -111,6 +111,7 @@ g1 <- df |>
 	) +
 	scale_fill_manual(values = dist_colors) +
 	theme_bw() +
+	labs_pubr() +
 	theme(legend.position = "none")
 
 beta1_1 <- get_posterior(params, "beta1")
@@ -126,18 +127,30 @@ g2 <- beta1_summary |>
 	geom_point(size = 2, color = "white") +
 	labs(x = "Base removal rate", y = element_blank()) +
 	coord_cartesian(xlim = c(0, 1)) +
-	# coord_flip() +
-	theme_bw()
+	theme_bw() +
+	labs_pubr()
 
-ggarrange(g1, g2, nrow = 2, labels = c("A", "B"), heights = c(2, 1))
+fig_6 <- ggarrange(g1, g2, nrow = 2, labels = c("A", "B"), heights = c(2, 1))
+
+fig_6 <- annotate_figure(
+	fig_6,
+	top = text_grob(
+		"Figure 6",
+		color = "black",
+		face = "bold",
+		size = 16,
+		hjust = 0,
+		x = 0.01
+	)
+)
 
 ggsave(
-	file.path(out_path, "methodEfficiency-v2.jpeg"),
+	file.path(out_path, "methodEfficiency-v2.pdf"),
 	dpi = "retina",
-	device = "jpeg",
-	units = "in",
-	width = 6,
-	height = 4
+	device = "pdf",
+	units = "cm",
+	width = 18,
+	height = 12
 )
 
 
@@ -151,34 +164,39 @@ omega <- get_posterior(params, "p_mu")
 omega_summary <- join_summarise_methods(omega, method_names)
 
 beta_p <- params |>
-  select(starts_with("beta_p")) |>
-  pivot_longer(cols = everything(),
-               names_to = "node",
-               values_to = "y")
+	select(starts_with("beta_p")) |>
+	pivot_longer(cols = everything(), names_to = "node", values_to = "y")
 
 beta_summary <- beta_p |>
-  left_join(method_names) |>
-  group_by(method, land) |>
-  summarise(`5%` = quantile(y, 0.05),
-            `25%` = quantile(y, 0.25),
-            `50%` = quantile(y, 0.5),
-            `75%` = quantile(y, 0.75),
-            `95%` = quantile(y, 0.95)) |>
-  ungroup() |>
-  mutate(method = factor(method, levels = c("Firearms", "Fixed wing", "Helicopter", "Snare", "Trap")))
+	left_join(method_names) |>
+	group_by(method, land) |>
+	summarise(
+		`5%` = quantile(y, 0.05),
+		`25%` = quantile(y, 0.25),
+		`50%` = quantile(y, 0.5),
+		`75%` = quantile(y, 0.75),
+		`95%` = quantile(y, 0.95)
+	) |>
+	ungroup() |>
+	mutate(
+		method = factor(
+			method,
+			levels = c("Firearms", "Fixed wing", "Helicopter", "Snare", "Trap")
+		)
+	)
 
 title <- element_blank()
 xlab <- "Effect"
 plot_post(beta_summary, xlab, title) +
-  facet_wrap(~ land, scales = "free") +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  theme(legend.position = "none")
+	facet_wrap(~land, scales = "free") +
+	geom_vline(xintercept = 0, linetype = "dashed") +
+	theme(legend.position = "none")
 
 ggsave(
-  file.path(out_path, "landcover-v2.jpeg"),
-  dpi = "retina",
-  device = "jpeg",
-  units = "in",
-  width = 6,
-  height = 4
+	file.path(out_path, "landcover-v2.jpeg"),
+	dpi = "retina",
+	device = "jpeg",
+	units = "in",
+	width = 6,
+	height = 4
 )
