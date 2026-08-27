@@ -104,11 +104,11 @@ my_tile <- function(df, m, x, y) {
 	if (grepl("bias", m)) {
 		limits <- round(c(-1 * ll, ll), 2)
 		breaks <- c(limits[1], 0, limits[2])
-		colors = c("#e9a3c9", "#f5f5f5", "#a1d76a")
+		colors <- c("#e9a3c9", "#f5f5f5", "#a1d76a")
 	} else {
 		limits <- round(c(0, ll), 2)
 		breaks <- round(seq(0, ll, length.out = 3), 2)
-		colors = c("navyblue", "darkmagenta", "darkorange1")
+		colors <- c("navyblue", "darkmagenta", "darkorange1")
 	}
 
 	ggplot(tmp) +
@@ -117,6 +117,7 @@ my_tile <- function(df, m, x, y) {
 		facet_grid(methods_used ~ .) +
 		scale_fill_gradientn(colors = colors, limits = limits, breaks = breaks) +
 		theme_bw() +
+		labs_pubr() +
 		theme(
 			legend.position = "bottom",
 			legend.text = element_text(size = 10, vjust = -1.5)
@@ -154,44 +155,61 @@ g2 <- my_tile(cats, m, x, y) +
 	labs(x = xlab, y = "", fill = nrmse_lab) +
 	theme(axis.text.y = element_blank(), strip.text = element_text(size = 8))
 
-ggarrange(g1, g2, ncol = 2, labels = "AUTO")
+fig_3 <- ggarrange(g1, g2, ncol = 2, labels = "AUTO")
+
+fig_3 <- annotate_figure(
+	fig_3,
+	top = text_grob(
+		"Figure 3",
+		color = "black",
+		face = "bold",
+		size = 16,
+		hjust = 0,
+		x = 0.01
+	)
+)
 
 ggsave(
-	file.path(out_path, "simulationNbiasNrmseHeatmap-v2.jpeg"),
+	file.path(out_path, "simulationNbiasNrmseHeatmap-v2.pdf"),
 	dpi = "retina",
-	device = "jpeg",
-	units = "in",
-	width = 6,
-	height = 6
+	device = "pdf",
+	units = "cm",
+	width = 18,
+	height = 22
 )
 
 
 tmp <- cats |>
-  filter(metric == "norm_bias_density") |>
-  group_by(methods_used, .data[[x]], .data[[y]]) |>
-  summarise(v = mean(value), n = n()) |>
-  ungroup() |>
-  filter(n >= 30)
+	filter(metric == "norm_bias_density") |>
+	group_by(methods_used, .data[[x]], .data[[y]]) |>
+	summarise(v = mean(value), n = n()) |>
+	ungroup() |>
+	filter(n >= 30)
 
 tmp |>
-  filter(methods_used %in% c("Helicopter", "Snares", "Traps"),
-         density_category != "Low") |>
-  filter(v == min(v) | v == max(v))
+	filter(
+		methods_used %in% c("Helicopter", "Snares", "Traps"),
+		density_category != "Low"
+	) |>
+	filter(v == min(v) | v == max(v))
 
 tmp |>
-  filter(!methods_used %in% c("Helicopter", "Snares", "Traps"),
-         density_category == "Low") |>
-  filter(v == min(v) | v == max(v))
+	filter(
+		!methods_used %in% c("Helicopter", "Snares", "Traps"),
+		density_category == "Low"
+	) |>
+	filter(v == min(v) | v == max(v))
 
 tmp <- cats |>
-  filter(metric == "nm_rmse_density") |>
-  group_by(methods_used, .data[[x]], .data[[y]]) |>
-  summarise(v = mean(value), n = n()) |>
-  ungroup() |>
-  filter(n >= 30)
+	filter(metric == "nm_rmse_density") |>
+	group_by(methods_used, .data[[x]], .data[[y]]) |>
+	summarise(v = mean(value), n = n()) |>
+	ungroup() |>
+	filter(n >= 30)
 
 tmp |>
-  filter(!methods_used %in% c("Helicopter", "Snares", "Traps"),
-         density_category == "Low") |>
-  filter(v == min(v) | v == max(v))
-
+	filter(
+		!methods_used %in% c("Helicopter", "Snares", "Traps"),
+		density_category == "Low"
+	) |>
+	filter(v == min(v) | v == max(v))
