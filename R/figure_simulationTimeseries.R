@@ -85,14 +85,14 @@ extant_properties <- density_take |>
 	pull(property_id)
 
 density_take |>
-  filter(density > 0) |>
-  group_by(start_density) |>
-  reframe(p = round(sum(recovered) / n(), 3))
+	filter(density > 0) |>
+	group_by(start_density) |>
+	reframe(p = round(sum(recovered) / n(), 3))
 
 density_take |>
-  filter(density == 0) |>
-  group_by(start_density) |>
-  reframe(p = round(sum(recovered) / n(), 3))
+	filter(density == 0) |>
+	group_by(start_density) |>
+	reframe(p = round(sum(recovered) / n(), 3))
 
 all_slopes <- tibble()
 all_props <- extant_properties
@@ -149,16 +149,15 @@ directions |>
 		prop_recovered = n_recovered / n
 	)
 
-get_id <- function(d){
-  set.seed(90)
-  directions |>
-    filter(direction == d,
-           obs_flag == 1) |>
-    group_by(property_id) |>
-    reframe(n = sum(obs_flag)) |>
-    filter(n > 8, n < 12) |>
-    pull(property_id) |>
-    sample(1)
+get_id <- function(d) {
+	set.seed(90)
+	directions |>
+		filter(direction == d, obs_flag == 1) |>
+		group_by(property_id) |>
+		reframe(n = sum(obs_flag)) |>
+		filter(n > 8, n < 12) |>
+		pull(property_id) |>
+		sample(1)
 }
 
 id1 <- get_id("Decreasing")
@@ -181,7 +180,7 @@ method_shapes <- plot_df |>
 	distinct() |>
 	mutate(shape = 1:n())
 
-plot_df |>
+fig_2 <- plot_df |>
 	mutate(
 		methods_used = stringr::str_replace(
 			methods_used,
@@ -229,19 +228,25 @@ plot_df |>
 	facet_wrap(~direction) +
 	# facet_grid(direction ~ .) +
 	theme_bw() +
-	theme(
-		axis.text = element_text(size = 8),
-		axis.title = element_text(size = 10),
-		strip.text = element_text(size = 10),
-		legend.title = element_text(size = 8),
-		legend.text = element_text(size = 8)
+	labs_pubr()
+
+fig_2 <- annotate_figure(
+	fig_2,
+	top = text_grob(
+		"Figure 2",
+		color = "black",
+		face = "bold",
+		size = 16,
+		hjust = 0,
+		x = 0.01
 	)
+)
 
 ggsave(
-	file.path("plots", "simulationTimeSeries-v2"),
+	file.path("plots", "simulationTimeSeries-v2.pdf"),
 	dpi = "retina",
-	device = "jpeg",
+	device = "pdf",
 	units = "cm",
-	width = 16,
+	width = 18,
 	height = 12
 )
