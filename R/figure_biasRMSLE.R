@@ -52,7 +52,8 @@ my_linerange <- function(df, m, x, w = 0.4) {
 		scale_color_manual(values = obs_cols) +
 		# scale_color_brewer(type = "qual", palette = 2) +
 		labs(color = element_blank()) +
-		theme_bw()
+		theme_bw() +
+		labs_pubr()
 }
 
 bias_lab <- expression("Bias (pigs / " ~ km^2 ~ ")")
@@ -93,7 +94,7 @@ fig_4 <- annotate_figure(
 
 
 ggsave(
-	file.path(out_path, "biasRMSLEDensity-v2"),
+	file.path(out_path, "biasRMSLEDensity-v2.pdf"),
 	dpi = "retina",
 	device = "pdf",
 	units = "cm",
