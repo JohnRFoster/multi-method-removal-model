@@ -69,7 +69,7 @@ g1 <- my_linerange(cats_summary, "mbias_density", x) +
 g2 <- my_linerange(cats_summary, "rmsle_density", x) +
 	labs(x = xlab, y = rmsle_lab)
 
-ggarrange(
+fig_4 <- ggarrange(
 	g1,
 	g2,
 	ncol = 2,
@@ -79,36 +79,30 @@ ggarrange(
 	legend = "bottom"
 )
 
+fig_4 <- annotate_figure(
+	fig_4,
+	top = text_grob(
+		"Figure 4",
+		color = "black",
+		face = "bold",
+		size = 16,
+		hjust = 0,
+		x = 0.01
+	)
+)
+
+
 ggsave(
 	file.path(out_path, "biasRMSLEDensity-v2"),
 	dpi = "retina",
-	device = "jpeg",
-	units = "in",
-	width = 6,
-	height = 4
+	device = "pdf",
+	units = "cm",
+	width = 18,
+	height = 22
 )
 
 cats_summary |>
-  filter(density_category == "Low",
-         metric == "mbias_density")
+	filter(density_category == "Low", metric == "mbias_density")
 
 cats_summary |>
-  filter(density_category == "High",
-         metric == "mbias_density")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	filter(density_category == "High", metric == "mbias_density")
