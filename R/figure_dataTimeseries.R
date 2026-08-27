@@ -141,7 +141,7 @@ method_shapes <- plot_data |>
 	distinct() |>
 	mutate(shape = seq_len(n()))
 
-plot_data |>
+fig_5 <- plot_data |>
 	mutate(
 		methods_used = as.factor(methods_used),
 		methods_used = str_replace(methods_used, "Firearms", "Ground-shooting")
@@ -182,19 +182,28 @@ plot_data |>
 	scale_x_date(date_labels = "%b-%Y") +
 	facet_wrap(~direction, scales = "free_x") +
 	theme_bw() +
+	labs_pubr() +
 	theme(
-		axis.text = element_text(size = 8),
-		axis.title = element_text(size = 10),
-		legend.title = element_text(size = 10),
-		legend.text = element_text(size = 8),
 		axis.text.x = element_text(angle = 90, vjust = 0.5)
 	)
 
+fig_5 <- annotate_figure(
+	fig_5,
+	top = text_grob(
+		"Figure 5",
+		color = "black",
+		face = "bold",
+		size = 16,
+		hjust = 0,
+		x = 0.01
+	)
+)
+
 ggsave(
-	file.path(out_path, "dataTimeSeries-v2.jpeg"),
+	file.path(out_path, "dataTimeSeries-v2.pdf"),
 	dpi = "retina",
-	device = "jpeg",
+	device = "pdf",
 	units = "cm",
-	width = 16,
-	height = 12
+	width = 18,
+	height = 22
 )
