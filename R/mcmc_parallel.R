@@ -226,7 +226,7 @@ mcmc_parallel <- function(
 		write_rds(list(params = p, diagnostic = d), file.path(dest, f))
 	}
 
-	write_abundnace <- function(no, nu, dest) {
+	write_abundance <- function(no, nu, dest) {
 		f <- "observedAbundanceSamples.rds"
 		write_rds(no, file.path(dest, f))
 
@@ -238,7 +238,7 @@ mcmc_parallel <- function(
 
 	converged <- all(diagnostic$psrf[, 2] < 1.1)
 	if (converged) {
-		write_abundnace(N_observed, N_unobserved, path)
+		write_abundance(N_observed, N_unobserved, path)
 	}
 
 	continue <- !diagnostic$done
@@ -285,7 +285,7 @@ mcmc_parallel <- function(
 		write_N <- if_else(converged, TRUE, FALSE)
 
 		if (converged | write_N) {
-			write_abundnace(N_observed, N_unobserved, path)
+			write_abundance(N_observed, N_unobserved, path)
 		}
 
 		continue <- !diagnostic$done
